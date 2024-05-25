@@ -1,4 +1,4 @@
-from openpyxl import load_workbook
+import pandas as pd
 
 class FlightInfo:
     def __init__(self, date, airline, departure, departure_time, arrival, arrival_time, duration, NH_price, KB_price, WOORI_price):
@@ -16,15 +16,14 @@ class FlightInfo:
         }
 
 def load_flights(file_path, sheet_name):
-    wb = load_workbook(file_path)
-    sheet = wb[sheet_name]
+    df = pd.read_excel(file_path, sheet_name=sheet_name)
     flights = []
-    for row in sheet.iter_rows(min_row=1, values_only=True):  # min_row를 1로 변경하여 첫 번째 행부터 시작합니다.
+    for index, row in df.iterrows():
         flight = FlightInfo(
-        row[0], row[1], row[2], 
-        row[3], row[4], row[5],
-        row[6], row[7], row[8], row[9]
-    )
+            row['Date'], row['Airline'], row['Departure'], row['Departure Time'],
+            row['Arrival'], row['Arrival Time'], row['Duration'], row['NH Price'],
+            row['KB Price'], row['WOORI Price']
+        )
         flights.append(flight)
     return flights
 
@@ -64,7 +63,7 @@ class PaymentCommand(Command):
         self.card_type = card_type
     
     def execute(self):
-        # 결제 로직을 구현합니다.
+        # 결제 로직을 구현.
         return f"결제 완료: {self.card_type} 카드 사용"
 
 class PaymentStrategy:
@@ -127,8 +126,5 @@ def main():
         selected_return_flight = return_results1[0]
         select_flight_command = SelectFlightCommand(selected_depart_flight, selected_return_flight)
 
-
-
 if __name__ == "__main__":
     main()
-
